@@ -41,12 +41,17 @@ EM_JS(void, glue_preint, (), {
 		 *`library_html5` is probably designed to be inited in script before
 		 * loading the Wasm).
 		 */
+		var preinit = function (device) {
+			Module["preinitializedWebGPUDevice"] = device;
+			entry();
+		};
 		if (navigator["gpu"]) {
 			navigator["gpu"]["requestAdapter"]().then(function (adapter) {
-				adapter["requestDevice"]().then( function (device) {
-					Module["preinitializedWebGPUDevice"] = device;
-					entry();
-				});
+				adapter["requestDevice"](["texture-compression-bc"]).then(
+					preinit, function () {
+						adapter["requestDevice"]().then(preinit);
+					}
+				);
 			}, function () {
 				console.error("No WebGPU adapter; not starting");
 			});
