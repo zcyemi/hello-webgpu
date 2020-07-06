@@ -223,8 +223,13 @@ WGPUDevice webgpu::create(window::Handle window, WGPUBackendType type) {
 	if (dawn_native::Adapter adapter = impl::requestAdapter(type)) {
 		wgpu::AdapterProperties properties;
 		adapter.GetProperties(&properties);
+		dawn_native::DeviceDescriptor devDesc;
+		devDesc.requiredExtensions.push_back("texture_compression_bc");
 		impl::backend = static_cast<WGPUBackendType>(properties.backendType);
-		impl::device  = adapter.CreateDevice();
+		impl::device  = adapter.CreateDevice(&devDesc);
+		if (!impl::device) {
+			 impl::device = adapter.CreateDevice();
+		}
 		impl::initSwapChain(impl::backend, impl::device, window);
 		DawnProcTable procs(dawn_native::GetProcs());
 		procs.deviceSetUncapturedErrorCallback(impl::device, impl::printError, nullptr);
