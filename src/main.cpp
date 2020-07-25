@@ -318,9 +318,9 @@ static void createPipelineAndBuffers() {
 	WGPUTexture text = wgpuDeviceCreateTexture(device, &textDesc);
 	
 	WGPUBufferCopyView srcView = {};
+	srcView.layout.bytesPerRow = (textExt.width / 4) * 8;
+	srcView.layout.rowsPerImage = textExt.height;
 	srcView.buffer = textBuf;
-	srcView.bytesPerRow = (textExt.width / 4) * 8;
-	srcView.rowsPerImage = textExt.height;
 
 	WGPUTextureCopyView dstView = {};
 	dstView.texture = text;
