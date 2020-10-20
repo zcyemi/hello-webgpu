@@ -297,7 +297,6 @@ static void createPipelineAndBuffers() {
 	textDesc.usage = WGPUTextureUsage_CopyDst | WGPUTextureUsage_Sampled;
 	textDesc.dimension = WGPUTextureDimension_2D;
 	textDesc.size = textExt;
-	textDesc.arrayLayerCount = 1;
 	textDesc.format = WGPUTextureFormat_BC1RGBAUnorm;
 	textDesc.mipLevelCount = 1;
 	textDesc.sampleCount = 1;
@@ -306,14 +305,8 @@ static void createPipelineAndBuffers() {
 	
 	WGPUBufferCopyView srcView = {};
 	srcView.buffer = textBuf;
-#ifdef __EMSCRIPTEN__
-	// Emscripten API hasn't caught up yet
-	srcView.bytesPerRow = (textExt.width / 4) * 8;
-	srcView.rowsPerImage = textExt.height;
-#else
 	srcView.layout.bytesPerRow = (textExt.width / 4) * 8;
 	srcView.layout.rowsPerImage = textExt.height;
-#endif
 
 	WGPUTextureCopyView dstView = {};
 	dstView.texture = text;
