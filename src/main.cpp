@@ -159,21 +159,6 @@ static WGPUShaderModule createShader(const uint32_t* code, uint32_t size, const 
 }
 
 /**
- * \def QUEUE_WRITE_BUFFER
- * Emscripten doesn't yet have \c wgpuQueueWriteBuffer() so we need to use the
- * deprecated \c wgpuBufferSetSubData() call instead.
- *
- * \todo replace with async call?
- */
-#ifndef QUEUE_WRITE_BUFFER
-#ifdef __EMSCRIPTEN__
-#define QUEUE_WRITE_BUFFER(buffer, off, data, size) wgpuBufferSetSubData(buffer, off, size, data)
-#else
-#define QUEUE_WRITE_BUFFER(buffer, off, data, size) wgpuQueueWriteBuffer(queue, buffer, off, data, size)
-#endif
-#endif
-
-/**
  * Helper to create a buffer.
  *
  * \param[in] data pointer to the start of the raw data
@@ -185,7 +170,7 @@ static WGPUBuffer createBuffer(const void* data, size_t size, WGPUBufferUsage us
 	desc.usage = WGPUBufferUsage_CopyDst | usage;
 	desc.size  = size;
 	WGPUBuffer buffer = wgpuDeviceCreateBuffer(device, &desc);
-	QUEUE_WRITE_BUFFER(buffer, 0, data, size);
+	wgpuQueueWriteBuffer(queue, buffer, 0, data, size);
 	return buffer;
 }
 
@@ -250,7 +235,9 @@ static void createPipelineAndBuffers() {
 	vertDesc.attributeCount = 3;
 	vertDesc.attributes = vertAttrs;
 	WGPUVertexStateDescriptor vertState = {};
+#ifdef __EMSCRIPTEN__ // Emscripten hasn't yet caught up with the API changes
 	vertState.indexFormat = WGPUIndexFormat_Uint16;
+#endif
 	vertState.vertexBufferCount = 1;
 	vertState.vertexBuffers = &vertDesc;
 
@@ -394,13 +381,17 @@ static bool redraw() {
 
 	// update the rotation
 	rotDeg += 0.1f;
-	QUEUE_WRITE_BUFFER(uRotBuf, 0, &rotDeg, sizeof(rotDeg));
+	wgpuQueueWriteBuffer(queue, uRotBuf, 0, &rotDeg, sizeof(rotDeg));
 
 	// draw the triangle (comment these five lines to simply clear the screen)
 	wgpuRenderPassEncoderSetPipeline(pass, pipeline);
 	wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, 0);
 	wgpuRenderPassEncoderSetVertexBuffer(pass, 0, vertBuf, 0, 0);
+#ifdef __EMSCRIPTEN__ // Emscripten hasn't yet caught up with the API changes
 	wgpuRenderPassEncoderSetIndexBuffer(pass, indxBuf, 0, 0);
+#else
+	wgpuRenderPassEncoderSetIndexBufferWithFormat(pass, indxBuf, WGPUIndexFormat_Uint16, 0, 0);
+#endif
 	wgpuRenderPassEncoderDrawIndexed(pass, 6, 1, 0, 0, 0);
 
 	wgpuRenderPassEncoderEndPass(pass);
