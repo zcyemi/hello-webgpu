@@ -323,6 +323,7 @@ static void createPipelineAndBuffers() {
 	WGPUSamplerDescriptor sampDesc = {};
 	sampDesc.magFilter = WGPUFilterMode_Linear;
 	sampDesc.minFilter = WGPUFilterMode_Linear;
+	sampDesc.maxAnisotropy = 1;
 	WGPUSampler sampler =  wgpuDeviceCreateSampler(device, &sampDesc);
 
 	// create the uniform bind group
