@@ -1,6 +1,7 @@
 #include "webgpu.h"
 
 #include <string.h>
+#include "../AppMain.h"
 
 WGPUDevice device;
 WGPUQueue queue;
@@ -397,11 +398,19 @@ static bool redraw() {
 
 extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 	if (window::Handle wHnd = window::create()) {
-		if ((device = webgpu::create(wHnd))) {
-			queue = wgpuDeviceGetQueue(device);
-			swapchain = webgpu::createSwapChain(device);
-			createPipelineAndBuffers();
 
+
+		AppMain* app = new AppMain();
+
+		if (app->InitWGPU(wHnd)) {
+
+			app->InitRendering();
+
+			device = app->device;
+			queue = app->queue;
+			swapchain = app->swapchain;
+
+			createPipelineAndBuffers();
 			window::show(wHnd);
 			window::loop(wHnd, redraw);
 
@@ -411,10 +420,11 @@ extern "C" int __main__(int /*argc*/, char* /*argv*/[]) {
 			wgpuBufferRelease(indxBuf);
 			wgpuBufferRelease(vertBuf);
 			wgpuRenderPipelineRelease(pipeline);
-			wgpuSwapChainRelease(swapchain);
+	/*		wgpuSwapChainRelease(swapchain);
 			wgpuQueueRelease(queue);
-			wgpuDeviceRelease(device);
+			wgpuDeviceRelease(device);*/
 		#endif
+			delete app;
 		}
 	#ifndef __EMSCRIPTEN__
 		window::destroy(wHnd);

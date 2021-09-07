@@ -170,12 +170,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppMain.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\win\glue.cpp" />
     <ClCompile Include="src\win\webgpu.cpp" />
     <ClCompile Include="src\win\window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppMain.h" />
     <ClInclude Include="inc\webgpu.h" />
     <ClInclude Include="inc\window.h" />
   </ItemGroup>

@@ -30,12 +30,18 @@
     <ClCompile Include="src\win\glue.cpp">
       <Filter>src\win</Filter>
     </ClCompile>
+    <ClCompile Include="AppMain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\webgpu.h">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\window.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="AppMain.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>
